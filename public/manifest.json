@@ -4,17 +4,17 @@
     "description": "Una aplicación para ayudar a los niños a aprender las tablas de multiplicar",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#000000",
+    "background_color": "#68d5c0",
+    "theme_color": "#68d5c0",
     "icons": [
       {
-        "src": "/icon-192x192.png",
-        "sizes": "192x192",
+        "src": "/icon-892x920.png",
+        "sizes": "892x920",
         "type": "image/png"
       },
       {
-        "src": "/icon-512x512.png",
-        "sizes": "512x512",
+        "src": "/icon-892x920.png",
+        "sizes": "892x920",
         "type": "image/png"
       }
     ]
