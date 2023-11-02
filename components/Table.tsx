@@ -28,7 +28,6 @@ const Table = () => {
       html: htmlContent,
       confirmButtonText: "Go!",
       customClass: {
-        content: "content-class",
         popup: "popup-class",
       },
     });
