@@ -1,4 +1,5 @@
 import Game from "@/components/Game";
+import Layout from "@/components/Layout";
 import { useEffect, useState } from "react";
 
 const GamePage = () => {
@@ -13,7 +14,9 @@ const GamePage = () => {
 
   return (
     <>
-      <Game />
+      <Layout>
+        <Game />
+      </Layout>
     </>
   );
 };

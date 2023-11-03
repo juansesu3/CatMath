@@ -1,15 +1,16 @@
-import Table from '@/components/Table';
-import React from 'react'
+import Layout from "@/components/Layout";
+import Table from "@/components/Table";
+import React from "react";
 
-interface Props {
-    
-}
+interface Props {}
 
- const TableStartPage = (props: Props) => {
-    return (
-     <>
-     <Table/>
-     </>
-    )
-}
+const TableStartPage = (props: Props) => {
+  return (
+    <>
+      <Layout>
+        <Table />
+      </Layout>
+    </>
+  );
+};
 export default TableStartPage;
