@@ -34,7 +34,7 @@ const Table = () => {
   };
 
   return (
-    <div className="font-myFont text-secondary flex flex-col items-center mt-20">
+    <div className="font-myFont text-secondary flex flex-col items-center mt-2">
       <h1 className="text-4xl font-bold mb-6">TABLES</h1>
       <div className="grid grid-cols-1 ">
         <div className="grid grid-cols-2 gap-y-4 gap-x-10">
@@ -42,7 +42,7 @@ const Table = () => {
             <button
               key={num}
               onClick={() => showMultiplicationTable(num)}
-              className="bg-pink-400 shadow-md  hover:bg-sky-700  hover:text-white w-16  h-16 rounded-full text-5xl flex items-center justify-center pb-2 pr-0"
+              className="bg-pink-400 shadow-md  hover:bg-sky-700  hover:text-white w-16  h-16 rounded-full text-5xl flex items-center justify-center pb-2 pr-0 transition duration-300 ease-in-out"
             >
               {num}
             </button>
