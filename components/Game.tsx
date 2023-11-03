@@ -22,15 +22,14 @@ const generateLevels = (maxTableNumber: number): Level[] => {
     const questions: Question[] = [];
     for (let j = 1; j <= 10; j++) {
       const result = i * j;
-      // Generar opciones aleatorias para la pregunta, asegurando que la respuesta correcta esté incluida
       let options = [result];
       while (options.length < 3) {
-        let option = getRandomNumber(result - 10, result + 10);
+        // Asegurarse de que el número mínimo sea al menos 1 para evitar números negativos y cero
+        let option = getRandomNumber(Math.max(1, result - 10), result + 10);
         if (options.indexOf(option) === -1 && option !== result) {
           options.push(option);
         }
       }
-      // Mezclar las opciones para que la posición de la respuesta correcta sea aleatoria
       options = options.sort(() => Math.random() - 0.5);
       questions.push({ multiplier: j, result, options });
     }
@@ -81,16 +80,18 @@ const Game = () => {
       </h2>
 
       {/* Mostrar las opciones */}
-      <div className="grid grid-cols-2 gap-3  justify-items-center align-items-center">
+      <div className="grid grid-cols-2 gap-3  justify-items-center align-items-center ">
         {currentQuestion.options.map((option, index) => (
           <button
             className={`${
               buttonColors[index]
-            } w-16 h-16 rounded-full  ${getButtonClass(index)}`}
+            } w-20 h-20 rounded-full text-5xl flex items-center justify-center ${getButtonClass(
+              index
+            )}`}
             key={index}
             onClick={() => handleAnswer(option)}
           >
-            {option}
+            <span className=" mb-3">{option}</span>
           </button>
         ))}
       </div>
