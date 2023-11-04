@@ -1,8 +1,11 @@
+import axios from "axios";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import Swal from "sweetalert2";
 const Table = () => {
+  const [userId, setUserId] = useState(null);
   const router = useRouter();
   const numbers = Array.from({ length: 12 }, (_, i) => i + 1);
   const showMultiplicationTable = (tableNumber: number) => {
@@ -41,6 +44,52 @@ const Table = () => {
   const goToGame = () => {
     router.push("/game");
   };
+  const { data: session } = useSession();
+  const userName = session?.user?.name;
+
+  console.log(userName);
+  useEffect(() => {
+    // Asumiendo que la petición '/api/user' te trae una lista de usuarios,
+    // y no se quiere filtrar en la petición, sino después de obtener la respuesta.
+    axios
+      .get("/api/user")
+      .then((response) => {
+        // Encuentra el usuario que coincide con el 'userName' de la sesión.
+        const user = response.data.find(
+          (u: { name: string | null | undefined }) => u.name === userName
+        );
+        if (user) {
+          // Aquí tienes el '_id' del usuario que coincide con el nombre de usuario de la sesión
+          setUserId(user._id);
+          console.log(user._id); // Hacer algo con el _id
+        }
+      })
+      .catch((error) => {
+        console.error(
+          "Error fetching user data",
+          error.response?.data || error.message
+        );
+      });
+  }, [userName]); // Se ejecuta sólo cuando 'userName' cambia
+
+  useEffect(() => {
+    // La llamada a la API para obtener la información del usuario por su ID
+    if (userId) {
+      // Se asegura de que userId no es nulo
+      axios
+        .get(`/api/user?id=${encodeURIComponent(userId)}`) // Usa el userId para hacer la llamada
+        .then((response) => {
+          // Puedes hacer algo con la información del usuario aquí
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(
+            "Error fetching user details",
+            error.response?.data || error.message
+          );
+        });
+    }
+  }, [userId]); // Depende de userId para re-ejecutarse
 
   return (
     <div className="font-myFont text-secondary flex flex-col items-center mt-2">
