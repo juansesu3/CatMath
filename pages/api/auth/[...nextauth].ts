@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 const isAdminEmails = async (email) => {
-  
+  return true
   return !!(await User.findOne({ email }));
 };
 
@@ -15,10 +15,10 @@ export const authOptions = {
       name: "credentials",
       credentials: {},
       async authorize(credentials) {
-        const { email, password } = credentials;
+        const { name, password } = credentials;
         try {
           await mongooseConnect();
-          const user = await User.findOne({ email });
+          const user = await User.findOne({ name });
           if (!user) {
             return null;
           }

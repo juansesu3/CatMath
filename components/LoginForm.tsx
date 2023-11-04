@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 
 export interface SignInCredentials {
-  email: string;
+  name: string;
   password: string;
 }
 
 const LoginForm: React.FC = () => {
   const [credentials, setCredentials] = useState<SignInCredentials>({
-    email: "",
+    name: "", // Reemplaza 'email' con 'name'
     password: "",
   });
   const [error, setError] = useState(false);
@@ -22,16 +22,15 @@ const LoginForm: React.FC = () => {
       [name]: value,
     }));
   }, []);
-
   const handleSignIn = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       setError(false);
-      const { email, password } = credentials;
+      const { name, password } = credentials; // Usa 'name' en lugar de 'email'
       try {
         const result = await signIn("credentials", {
           redirect: false,
-          email,
+          name, // Asegúrate de que el backend maneje 'name' como identificador
           password,
         });
         if (result?.error) {
@@ -44,7 +43,6 @@ const LoginForm: React.FC = () => {
     },
     [credentials]
   );
-
   return (
     <div className="font-myFont w-screen h-screen flex  justify-center items-center">
       <div className=" flex flex-col text-center w-full m-auto">
@@ -59,10 +57,10 @@ const LoginForm: React.FC = () => {
           </div>
           <form className="flex flex-col gap-2 mt-2">
             <input
-              name="email"
+              name="name"
               type="text"
-              placeholder="user"
-              value={credentials.email}
+              placeholder="user name"
+              value={credentials.name}
               onChange={handleChange}
               className="rounded-md p-2 shadow-sm focus:shadow-lg focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
             />
@@ -85,7 +83,10 @@ const LoginForm: React.FC = () => {
             )}
           </form>
           <div>
-            <Link href="/register" className="text-md font-light cursor-pointer hover:text-secondary transition duration-300 ease-in-out">
+            <Link
+              href="/register"
+              className="text-md font-light cursor-pointer hover:text-secondary transition duration-300 ease-in-out"
+            >
               Don&apos;t have an account yet?
             </Link>
           </div>

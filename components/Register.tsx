@@ -3,17 +3,17 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 const Register = () => {
-  const [image, setImage] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState(""); // assuming 'role' is a string
   const [error, setError] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
-    const data = { name, email, password, image };
-    if (!name || !email || !password || !image) {
+    const data = { name, email, password, role };
+    if (!name || !role || !name || !email || !password) {
       setError(true);
       return;
     }
@@ -34,6 +34,13 @@ const Register = () => {
           value={name}
           onChange={(ev) => setName(ev.target.value)}
           placeholder="user name"
+        />
+        <input
+          type="text"
+          className="rounded-md p-2 shadow-sm focus:shadow-lg focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"
+          value={role}
+          onChange={(ev) => setRole(ev.target.value)}
+          placeholder="participante | supervisor"
         />
         <input
           className="rounded-md p-2 shadow-sm focus:shadow-lg focus:outline-none focus:border-blue-500 transition duration-300 ease-in-out"

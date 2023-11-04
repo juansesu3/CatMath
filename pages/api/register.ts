@@ -9,7 +9,7 @@ interface ExtendedNextApiRequest extends NextApiRequest {
         name?: string;
         email?: string;
         password?: string;
-        image?: string;
+
     };
     query: {
         id?: string;
@@ -47,7 +47,7 @@ const handler = async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
                 break;
 
             case "POST":
-                if (!req.body.name || !req.body.email || !req.body.password || !req.body.image) {
+                if (!req.body.name || !req.body.email || !req.body.password) {
                     res.status(400).json({ message: 'Missing fields' });
                     return;
                 }
