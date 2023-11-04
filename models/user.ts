@@ -1,8 +1,16 @@
 import { Schema, model, models } from "mongoose";
 
-const UserSchema = new Schema(
+export interface IUser extends Document {
+  username: string;
+  role: 'participante' | 'supervisor';
+  points: number;
+  currentLevel: number;
+  correctAnswers: number;
+}
+
+const UserSchema = new Schema<IUser>(
   {
-    username: String,
+    username: { type: String, required: true },
     role: {
       type: String,
       enum: ['participante', 'supervisor'],

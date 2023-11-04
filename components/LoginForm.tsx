@@ -1,5 +1,6 @@
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useState } from "react";
 
 export interface SignInCredentials {
@@ -83,6 +84,11 @@ const LoginForm: React.FC = () => {
               <p className="error-message-class-names">Invalid Credentials</p>
             )}
           </form>
+          <div>
+            <Link href="/register" className="text-md font-light cursor-pointer hover:text-secondary transition duration-300 ease-in-out">
+              Don&apos;t have an account yet?
+            </Link>
+          </div>
         </div>
       </div>
     </div>
