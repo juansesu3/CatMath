@@ -1,16 +1,16 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState(""); // assuming 'role' is a string
-  const [error, setError] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [role, setRole] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSubmit = async (ev) => {
+  const handleSubmit = async (ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     const data = { name, email, password, role };
     if (!name || !role || !name || !email || !password) {
@@ -58,7 +58,6 @@ const Register = () => {
         />
         <button
           type="submit"
-          href={"https://e-commerce-admin-kappa.vercel.app/"}
           className="bg-[#3ab14b] p-2 px-4 rounded-md text-white hover:bg-[#f14c90] font-medium shadow-md transition duration-300 ease-in-out"
         >
           Register
