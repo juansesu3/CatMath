@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Question = {
   multiplier: number;
@@ -20,7 +20,7 @@ const generateLevels = (maxTableNumber: number): Level[] => {
   const levels: Level[] = [];
   for (let i = 0; i <= maxTableNumber; i++) {
     const questions: Question[] = [];
-    for (let j = 1; j <= 10; j++) {
+    for (let j = 1; j <= 12; j++) {
       const result = i * j;
       let options = [result];
       while (options.length < 3) {
@@ -41,27 +41,49 @@ const generateLevels = (maxTableNumber: number): Level[] => {
 const Game = () => {
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const levels = generateLevels(12);
+  const [timeLeft, setTimeLeft] = useState(10); // Estado para el tiempo restante
+  const [levels, setLevels] = useState<Level[]>(generateLevels(12)); // Genera los niveles una vez y los almacena en el estado
+
   const currentLevel = levels[currentLevelIndex];
   const currentQuestion = currentLevel.questions[currentQuestionIndex];
+
+  // Efecto para iniciar el temporizador
   const buttonColors = [
     "bg-[#f78f2e]",
     "bg-[#f14c90]",
     "bg-[#fde642]",
     "bg-[#3ab14b]",
   ].sort(() => Math.random() - 0.5);
+
+ 
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timerId); // Limpieza al desmontar o actualizar el componente
+    } else {
+      // Manejar el tiempo agotado
+      nextQuestion();
+    }
+  }, [timeLeft]);
+
+  
+  const nextQuestion = () => {
+    if (currentQuestionIndex < currentLevel.questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      setCurrentLevelIndex((prev) => prev + 1);
+      setCurrentQuestionIndex(0);
+    }
+    setTimeLeft(10); // Restablecer el tiempo para la siguiente pregunta
+  };
+
   const handleAnswer = (answer: number) => {
     if (answer === currentQuestion.result) {
-      // Si la respuesta es correcta, ir a la siguiente pregunta
-      if (currentQuestionIndex < currentLevel.questions.length - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1);
-      } else {
-        // Si todas las preguntas están completadas, pasar al siguiente nivel
-        setCurrentLevelIndex((prev) => prev + 1);
-        setCurrentQuestionIndex(0);
-      }
+      nextQuestion();
     } else {
       alert("¡Respuesta incorrecta! Inténtalo de nuevo.");
+      // Opcional: restablecer el temporizador si se desea dar tiempo extra después de una respuesta incorrecta
+      setTimeLeft(10);
     }
   };
   const getButtonClass = (index: number) => {
@@ -94,6 +116,12 @@ const Game = () => {
             <span className=" mb-3">{option}</span>
           </button>
         ))}
+      </div>
+      <div className="w-full bg-gray-200 h-4">
+        <div
+          className="bg-green-500 h-4"
+          style={{ width: `${(timeLeft / 10) * 100}%` }}
+        ></div>
       </div>
     </div>
   );
