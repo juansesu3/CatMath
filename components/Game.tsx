@@ -45,14 +45,13 @@ const Game = () => {
   const [timeLeft, setTimeLeft] = useState(10); // Estado para el tiempo restante
   const [levels, setLevels] = useState<Level[]>(generateLevels(12)); // Genera los niveles una vez y los almacena en el estado
   const [score, setScore] = useState(0); // Estado para rastrear la puntuación del jugador
+  const [userState, setUserState] = useState([]);
   const [userId, setUserId] = useState(null);
   const currentLevel = levels[currentLevelIndex];
   const currentQuestion = currentLevel.questions[currentQuestionIndex];
-
   const { data: session } = useSession();
   const userName = session?.user?.name;
 
-  console.log(userName);
   useEffect(() => {
     // Asumiendo que la petición '/api/user' te trae una lista de usuarios,
     // y no se quiere filtrar en la petición, sino después de obtener la respuesta.
@@ -60,13 +59,15 @@ const Game = () => {
       .get("/api/user")
       .then((response) => {
         // Encuentra el usuario que coincide con el 'userName' de la sesión.
+        console.log("data before filter",response.data)
         const user = response.data.find(
           (u: { name: string | null | undefined }) => u.name === userName
         );
         if (user) {
           // Aquí tienes el '_id' del usuario que coincide con el nombre de usuario de la sesión
           setUserId(user._id);
-          console.log(user._id); // Hacer algo con el _id
+          setUserState(user)
+          console.log("user data",user); // Hacer algo con el _id
         }
       })
       .catch((error) => {
@@ -75,17 +76,18 @@ const Game = () => {
           error.response?.data || error.message
         );
       });
-  }, [userName]); // Se ejecuta sólo cuando 'userName' cambia
-
-  useEffect(() => {
-    // La llamada a la API para obtener la información del usuario por su ID
     if (userId) {
       // Se asegura de que userId no es nulo
       axios
         .get(`/api/user?id=${encodeURIComponent(userId)}`) // Usa el userId para hacer la llamada
         .then((response) => {
-          // Puedes hacer algo con la información del usuario aquí
-          console.log(response.data);
+        
+
+          //Puedes hacer algo con la información del usuario aquí
+          console.log(
+            "Debug data get user by id client side >>< ",
+            response.data
+          );
         })
         .catch((error) => {
           console.error(
@@ -94,7 +96,7 @@ const Game = () => {
           );
         });
     }
-  }, [userId]); // Depende de userId para re-ejecutarse
+  }, [userName]); // Se ejecuta sólo cuando 'userName' cambia
 
   // Efecto para iniciar el temporizador
   const buttonColors = [
@@ -114,13 +116,34 @@ const Game = () => {
     }
   }, [timeLeft]);
 
+  const data = {
+    points: score,
+  };
+  const updatePoints = () => {
+    // console.log(data);
+
+    const _id = userId;
+    if (_id) {
+      try {
+        axios.put(`/api/user`, { ...data, _id });
+
+        // console.log("Points updated: ");
+      } catch (error) {
+        console.error(
+          "Error updating points: ",
+          error.response?.data || error.message
+        );
+      }
+    }
+  };
+
   const nextQuestion = () => {
     // Restablecer el temporizador para la siguiente pregunta
     setTimeLeft(10);
 
     if (currentQuestionIndex < currentLevel.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
-    } else if (score >= 11) {
+    } else if (score >= 12) {
       // Verificar si la puntuación es suficiente para avanzar
       // Resetear la puntuación para el siguiente nivel y avanzar si las condiciones son correctas
       setScore(0); // Restablece la puntuación al pasar al siguiente nivel si deseas que la puntuación sea por nivel
@@ -131,31 +154,16 @@ const Game = () => {
       alert("No tienes suficientes puntos para pasar al siguiente nivel.");
     }
   };
-  const updatePoints = async (newPoints: number) => {
-   
-    const data = {
-      points: newPoints,
-    };
-    try {
-      const response = await axios.put(`/api/user`, { ...data, _id: userId });
-
-      console.log("Points updated: ", response.data);
-    } catch (error) {
-      console.error(
-        "Error updating points: ",
-        error.response?.data || error.message
-      );
-    }
-  };
 
   const handleAnswer = (answer: number) => {
     if (answer === currentQuestion.result) {
       setScore((prevScore) => {
         const newScore = prevScore + 1;
         // Actualizar los puntos usando la nueva puntuación como referencia
-        updatePoints(newScore); // Enviar el incremento de puntos
+        // Enviar el incremento de puntos
         return newScore;
       });
+      updatePoints();
       nextQuestion();
     } else {
       alert("¡Respuesta incorrecta! Inténtalo de nuevo.");
