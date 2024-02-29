@@ -13,7 +13,6 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
-
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -25,7 +24,6 @@ const UserSchema = new Schema<IUser>(
     points: { type: Number, default: 0 },
     currentLevel: { type: Number, default: 0 },
     correctAnswers: { type: Number, default: 0 },
-
   },
   {
     timestamps: true,

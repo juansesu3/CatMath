@@ -39,6 +39,7 @@ const generateLevels = (maxTableNumber: number): Level[] => {
 };
 
 const Game = () => {
+  const [correctAnswers, setCorrectAnswers] = useState<Answer[]>([]);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(10); // Estado para el tiempo restante
@@ -78,7 +79,28 @@ const Game = () => {
   };
 
   const handleAnswer = (answer: number) => {
-    if (answer === currentQuestion.result) {
+    const isCorrect = answer === currentQuestion.result;
+    const responseTime = 10 - timeLeft; // Calcular el tiempo de respuesta (10 segundos menos el tiempo restante)
+
+    if (isCorrect) {
+      setCorrectAnswers((prev) => [
+        ...prev,
+        {
+          tableNumber: currentLevel.tableNumber,
+          multiplier: currentQuestion.multiplier,
+          responseTime,
+        },
+      ]);
+
+      // Opcional: Puedes hacer algo más con la información, como enviarla a una API
+      console.log("Respuesta correcta:", currentQuestion.result);
+      console.log("Tiempo de respuesta:", responseTime);
+      console.log(
+        correctAnswers
+      )
+    }
+
+    if (isCorrect) {
       nextQuestion();
     } else {
       alert("¡Respuesta incorrecta! Inténtalo de nuevo.");
