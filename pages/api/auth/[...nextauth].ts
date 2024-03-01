@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 // Correctly type the email parameter
 const isAdminEmails = async (name: string): Promise<boolean> => {
   // Return true immediately (for testing? Remove if not needed)
-  return true; // Remove this line to use the function normally
+  // Remove this line to use the function normally
 
   // Check if a user with the given email is an admin
   return !!(await User.findOne({ name: name }));
@@ -63,14 +63,28 @@ export const authOptions = {
 
 export default NextAuth(authOptions);
 export const isAdminRequest = async (req: NextApiRequest, res: NextApiResponse) => {
-  const session = await getServerSession(req, res, authOptions);
+  try {
+    const session = await getServerSession(req, res, authOptions);
 
-  // Since session?.user?.email might not be present, you need to verify and throw an error accordingly.
-  // Note that you're using 'session?.user?.email' but ensure that you're using the correct property that your session object has.
-  // If 'name' is what you should be checking against, adjust accordingly.
-  if (!(await isAdminEmails(session?.user?.name || ''))) { // Here the check should align with your actual user session properties
-    res.status(401).end("Not an admin");
-    return; // Return to prevent further execution
+    // Ensure that session is present and user is authenticated
+    if (!session || !session.user) {
+      res.status(401).end("Not authenticated");
+      return;
+    }
+
+    // You can now access session.user.name and other properties
+
+    // Since session?.user?.email might not be present, you need to verify and throw an error accordingly.
+    // Note that you're using 'session?.user?.email' but ensure that you're using the correct property that your session object has.
+    // If 'name' is what you should be checking against, adjust accordingly.
+    if (!(await isAdminEmails(session.user.name || ''))) {
+      res.status(401).end("Not an admin");
+      return; // Return to prevent further execution
+    }
+
+    // ...rest of the admin-specific logic
+  } catch (error) {
+    console.error("Error in isAdminRequest:", error);
+    res.status(500).end("Internal Server Error");
   }
-  // ...rest of the admin-specific logic
 };

@@ -1,4 +1,7 @@
+import axios from "axios";
+import { getServerSession } from "next-auth";
 import { useEffect, useState } from "react";
+
 
 type Question = {
   multiplier: number;
@@ -44,10 +47,10 @@ const Game = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(10); // Estado para el tiempo restante
   const [levels, setLevels] = useState<Level[]>(generateLevels(12)); // Genera los niveles una vez y los almacena en el estado
-
+  const [score, setScore] = useState(0);
   const currentLevel = levels[currentLevelIndex];
   const currentQuestion = currentLevel.questions[currentQuestionIndex];
-
+  const [userLoggedId, setUserLoggedId] = useState();
   // Efecto para iniciar el temporizador
   const buttonColors = [
     "bg-[#f78f2e]",
@@ -56,7 +59,9 @@ const Game = () => {
     "bg-[#3ab14b]",
   ].sort(() => Math.random() - 0.5);
 
- 
+
+  
+  
   useEffect(() => {
     if (timeLeft > 0) {
       const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -92,12 +97,24 @@ const Game = () => {
         },
       ]);
 
+      setScore((prevScore) => {
+        const updatedScore = prevScore + 1;
+        console.log("Puntuación acumulada:", updatedScore);
+        // Llama a la función para actualizar la información del usuario
+     if (userLoggedId) {
+        // Verifica que userLoggedId sea válido antes de llamar a updateUserData
+        updateUserData(userLoggedId, updatedScore, currentLevelIndex);
+      }
+      
+        return updatedScore;
+      });
+     
       // Opcional: Puedes hacer algo más con la información, como enviarla a una API
       console.log("Respuesta correcta:", currentQuestion.result);
       console.log("Tiempo de respuesta:", responseTime);
-      console.log(
-        correctAnswers
-      )
+      console.log("Puntuación acumulada:", score);
+      console.log(currentLevel.tableNumber);
+      
     }
 
     if (isCorrect) {
@@ -114,6 +131,37 @@ const Game = () => {
       return "col-span-2";
     }
     return "";
+  };
+
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get("/api/game"); // Reemplaza "/api/user" con la ruta correcta de tu API
+      const user = response.data; // Supongo que la información del usuario está en la propiedad "data"
+      setUserLoggedId(user._id)
+      console.log("Usuario obtenido:", user._id);
+    } catch (error) {
+      console.error("Error al obtener el usuario:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Llama a la función para obtener al usuario cuando el componente se monta
+    fetchUser();
+  }, []);
+  
+  const updateUserData = async (userLoggedId: string, score: number, currentLevelIndex: number) => {
+  
+    try {
+      // Llamar a tu API para actualizar la información del usuario
+      const response = await axios.put(`/api/game?id=${userLoggedId}`, {
+        points: score, // Actualizar puntos
+        currentLevel: currentLevelIndex, // Actualizar nivel actual
+      });
+  
+      console.log("Información del usuario actualizada:", response.data);
+    } catch (error) {
+      console.error("Error al actualizar la información del usuario:", error);
+    }
   };
 
   return (
