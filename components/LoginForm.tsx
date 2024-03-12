@@ -22,27 +22,12 @@ const LoginForm: React.FC = () => {
       [name]: value,
     }));
   }, []);
-  const handleSignIn = useCallback(
-    async (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      setError(false);
-      const { name, password } = credentials; // Usa 'name' en lugar de 'email'
-      try {
-        const result = await signIn("credentials", {
-          redirect: false,
-          name, // Asegúrate de que el backend maneje 'name' como identificador
-          password,
-        });
-        if (result?.error) {
-          setError(true);
-        }
-      } catch (error) {
-        console.error(error);
-        setError(true);
-      }
-    },
-    [credentials]
-  );
+
+  const handleSignIn = (provider)=>{
+
+    signIn(provider)
+
+  }
   return (
     <div className="font-myFont w-screen h-screen flex  justify-center items-center">
       <div className=" flex flex-col text-center w-full m-auto">
@@ -55,6 +40,7 @@ const LoginForm: React.FC = () => {
               height={100}
             />
           </div>
+          {/* 
           <form className="flex flex-col gap-2 mt-2">
             <input
               name="name"
@@ -82,6 +68,7 @@ const LoginForm: React.FC = () => {
               <p className="error-message-class-names">Invalid Credentials</p>
             )}
           </form>
+         
           <div>
             <Link
               href="/register"
@@ -90,6 +77,13 @@ const LoginForm: React.FC = () => {
               Don&apos;t have an account yet?
             </Link>
           </div>
+           */}
+            <button
+              onClick={()=>handleSignIn('google')}
+              className="bg-[#3ab14b] mt-4 p-2 px-4 rounded-md text-white hover:bg-[#f14c90] font-medium shadow-md transition duration-300 ease-in-out"
+            >
+              Login with Google
+            </button>
         </div>
       </div>
     </div>
