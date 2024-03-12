@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 
@@ -42,6 +42,8 @@ const generateLevels = (maxTableNumber: number): Level[] => {
 };
 
 const Game = () => {
+
+  const { data: session } = useSession();
   const [correctAnswers, setCorrectAnswers] = useState<Answer[]>([]);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
