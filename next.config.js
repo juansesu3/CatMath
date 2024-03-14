@@ -5,6 +5,7 @@ const nextConfig = {
     domains: [
       "juan-sesu-ecommerce.s3.amazonaws.com",
       "my-page-negiupp.s3.amazonaws.com",
+      'lh3.googleusercontent.com'
     ],
   },
 }

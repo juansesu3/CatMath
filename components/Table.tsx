@@ -41,27 +41,26 @@ const Table = () => {
     const blurEffect = (text: string, isBlurred: boolean) => {
       return isBlurred ? `<span class="blur">${text}</span>` : text;
     };
-  
+
     // HTML de las respuestas
     const responsesHTML = numbers.map(
       (num) =>
-        `<li class="mb-2">${tableNumber} x ${num} = ${
-          tableNumber * num
+        `<li class="mb-2">${tableNumber} x ${num} = ${tableNumber * num
         }</li>`
     );
-  
+
     // Verificar si el nivel está desbloqueado o bloqueado
     const isUnlocked = currentLevelIndex >= tableNumber;
-  
+
     // Mensaje sobre el efecto de desenfoque
     const unlockMessage = !isUnlocked
-    ? `<div class="absolute inset-0 flex items-center justify-center">
+      ? `<div class="absolute inset-0 flex items-center justify-center">
         <div class="  w-60 h-32 bg-pink-500  rounded-lg flex items-center justify-center shadow-md opacity-1">
           <p class="text-white font-semibold text-lg text-center z-10">This level is locked! <br /> Play to unlock levels!</p>
         </div>
       </div>`
-    : "";
-  
+      : "";
+
     // Aplicar un efecto de desenfoque si el nivel está bloqueado
     const htmlContent = `
       <div>
@@ -71,12 +70,12 @@ const Table = () => {
           ${unlockMessage} <!-- Mensaje sobre el efecto de desenfoque -->
           <ul>
               ${responsesHTML.map((response) =>
-                blurEffect(response, !isUnlocked)
-              ).join("")}
+      blurEffect(response, !isUnlocked)
+    ).join("")}
           </ul>
       </div>
     `;
-  
+
     Swal.fire({
       title: "Multiplication Table",
       html: htmlContent,
@@ -94,8 +93,8 @@ const Table = () => {
   };
 
   return (
-    <div className="font-myFont text-secondary flex flex-col items-center mt-2">
-     
+    <div className="font-myFont text-secondary flex flex-col items-center mt-10">
+
       <h1 className="text-4xl font-bold ">TABLES</h1>
       <div className="flex justify-center gap-4 my-4">
         <button
@@ -148,17 +147,7 @@ const Table = () => {
           ))}
         </div>
       </div>
-      <button
-        onClick={logout}
-        className="bg-red-500  mb-2 cursor-pointer hover:bg-gray-400 px-4 py-1  m-auto text-white font-myFont flex items-center justify-center rounded-md mt-6 shadow-md transition duration-300 ease-in-out"
-      >
-        logout
-      </button>
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 p-4 flex justify-around">
-  <div>Profile</div>
-  <div>Home</div>
-  <div>Settings</div>
-</div>
+      
     </div>
   );
 };
