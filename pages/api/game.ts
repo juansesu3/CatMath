@@ -8,10 +8,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await mongooseConnect();
   await isAdminRequest(req, res);
   const session = await getSession({ req });
-
-
   const authenticatedUserEmail = session?.user?.email;
-
+  
   const { method } = req;
 
   if (method === 'GET') {
