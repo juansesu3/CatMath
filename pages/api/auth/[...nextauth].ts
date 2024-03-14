@@ -11,11 +11,15 @@ const isAdminEmails = async (email: string): Promise<boolean> => {
   return !!(await User.findOne({ email: email }));
 };
 
+const clientIdX = process.env.GOOGLE_CLIENT_ID || ''
+const clientSecretX = process.env.GOOGLE_CLIENT_SECRET || ''
+
 const authOptions ={
+  secret : process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ""
+      clientId: clientIdX,
+      clientSecret: clientSecretX 
     })
   ],
   adapter: MongoDBAdapter(clientPromise),
