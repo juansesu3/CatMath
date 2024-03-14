@@ -1,4 +1,5 @@
 import axios from "axios";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -9,6 +10,13 @@ const Table = () => {
   const [userLogged, setUserLogged] = useState()
   const [score, setScore] = useState(0);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+  const logout = async () => {
+    await router.push("/");
+    await signOut();
+  };
+
+
+
 
   const fetchUser = async () => {
     try {
@@ -87,6 +95,7 @@ const Table = () => {
 
   return (
     <div className="font-myFont text-secondary flex flex-col items-center mt-2">
+     
       <h1 className="text-4xl font-bold ">TABLES</h1>
       <div className="flex justify-center gap-4 my-4">
         <button
@@ -139,6 +148,17 @@ const Table = () => {
           ))}
         </div>
       </div>
+      <button
+        onClick={logout}
+        className="bg-red-500  mb-2 cursor-pointer hover:bg-gray-400 px-4 py-1  m-auto text-white font-myFont flex items-center justify-center rounded-md mt-6 shadow-md transition duration-300 ease-in-out"
+      >
+        logout
+      </button>
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 p-4 flex justify-around">
+  <div>Profile</div>
+  <div>Home</div>
+  <div>Settings</div>
+</div>
     </div>
   );
 };

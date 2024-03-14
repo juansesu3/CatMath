@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
+import Swal from "sweetalert2";
 
 type Question = {
   multiplier: number;
@@ -17,19 +18,19 @@ type Level = {
 type Answer = {
   tableNumber: number;
   multiplier: number;
-  responseTime:number;
+  responseTime: number;
 
 };
 
-type User ={
-  currentLevel:number;
-  email:string;
-  image:string;
-  name:string;
-  points:string;
-  _id:string;
-  updatedAt:Date;
-  emailVerified:boolean;
+type User = {
+  currentLevel: number;
+  email: string;
+  image: string;
+  name: string;
+  points: string;
+  _id: string;
+  updatedAt: Date;
+  emailVerified: boolean;
 
 
 }
@@ -61,6 +62,7 @@ const generateLevels = (maxTableNumber: number): Level[] => {
 };
 
 const Game = () => {
+  const router = useRouter();
   const [correctAnswers, setCorrectAnswers] = useState<Answer[]>([]);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -77,8 +79,10 @@ const Game = () => {
     "bg-[#3ab14b]",
   ].sort(() => Math.random() - 0.5);
 
+  const goBack = () => {
+    router.push("/tableStart");
+  };
 
-  
   const fetchUser = async () => {
     try {
       const response = await axios.get("/api/game"); // Reemplaza "/api/user" con la ruta correcta de tu API
@@ -86,7 +90,7 @@ const Game = () => {
       setUserLogged(user);
       console.log("Usuario obtenido:", user);
       setCurrentLevelIndex(user.currentLevel); // Establecer el nivel actual
-      setScore(parseInt(user.points)); 
+      setScore(parseInt(user.points));
     } catch (error) {
       console.error("Error al obtesner el usuario:", error);
     }
@@ -103,13 +107,13 @@ const Game = () => {
         levels.length - 1 // Asegurarse de no exceder el número máximo de niveles
       );
       setCurrentLevelIndex(currentLevelIndex);
-      
+
       // Calcular el índice de la pregunta actual dentro del nivel actual
       const currentQuestionIndex = score % 12 === 0 ? 11 : (score % 12) - 1;
       setCurrentQuestionIndex(currentQuestionIndex);
     }
   }, [score]);
-  
+
   useEffect(() => {
     if (timeLeft > 0) {
       const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -120,11 +124,35 @@ const Game = () => {
     }
   }, [timeLeft]);
 
-  
+  // Nueva función para acumular las preguntas no respondidas
+  const accumulateUnansweredQuestions = () => {
+    const unansweredQuestions: Question[] = [];
+    for (let i = currentQuestionIndex + 1; i < currentLevel.questions.length; i++) {
+      unansweredQuestions.push(currentLevel.questions[i]);
+    }
+    return unansweredQuestions;
+  };
+
+
   const nextQuestion = () => {
     if (currentQuestionIndex < currentLevel.questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
+      // Verificar si hay preguntas no respondidas y agregarlas al final del nivel
+      const unansweredQuestions = accumulateUnansweredQuestions();
+      console.log(unansweredQuestions)
+      if (unansweredQuestions.length > 0) {
+        const updatedQuestions = [...currentLevel.questions, ...unansweredQuestions];
+        setLevels((prevLevels) => {
+          const updatedLevels = prevLevels.map((level) => {
+            if (level.tableNumber === currentLevel.tableNumber) {
+              return { ...level, questions: updatedQuestions };
+            }
+            return level;
+          });
+          return updatedLevels;
+        });
+      }
       setCurrentLevelIndex((prev) => prev + 1);
       setCurrentQuestionIndex(0);
     }
@@ -149,22 +177,28 @@ const Game = () => {
         const updatedScore = prevScore + 1;
         console.log("Puntuación acumulada:", updatedScore);
         // Llama a la función para actualizar la información del usuario
-     if (userLogged?._id) {
-        // Verifica que userLoggedId sea válido antes de llamar a updateUserData
-        updateUserData(userLogged._id, updatedScore, currentLevelIndex);
-      }
-      
+        if (userLogged?._id) {
+          // Verifica que userLoggedId sea válido antes de llamar a updateUserData
+          updateUserData(userLogged._id, updatedScore, currentLevelIndex);
+        }
+
         return updatedScore;
       });
-      
+
     }
 
     if (isCorrect) {
       nextQuestion();
     } else {
-      alert("¡Respuesta incorrecta! Inténtalo de nuevo.");
-      // Opcional: restablecer el temporizador si se desea dar tiempo extra después de una respuesta incorrecta
-      setTimeLeft(10);
+      Swal.fire({
+        icon: "error",
+        title: "¡Respuesta incorrecta!",
+        text: "Inténtalo de nuevo.",
+        confirmButtonText: "OK",
+      }).then((result) => {
+        // Opcional: restablecer el temporizador si se desea dar tiempo extra después de una respuesta incorrecta
+        setTimeLeft(10);
+      });
     }
   };
   const getButtonClass = (index: number) => {
@@ -176,9 +210,8 @@ const Game = () => {
   };
 
 
-  
+
   const updateUserData = async (userLoggedId: string, score: number, currentLevelIndex: number) => {
-  
     try {
       // Llamar a tu API para actualizar la información del usuario
       const response = await axios.put(`/api/game?id=${userLoggedId}`, {
@@ -189,23 +222,20 @@ const Game = () => {
       console.error("Error al actualizar la información del usuario:", error);
     }
   };
-
   return (
     <div className="min-h-screen  flex flex-col gap-6 items-center justify-center font-myFont font-bold  text-secondary">
       {/* Mostrar la pregunta actual */}
       <h2 className="text-5xl  ">
         {currentLevel.tableNumber} x {currentQuestion.multiplier} = ?
       </h2>
-
       {/* Mostrar las opciones */}
       <div className="grid grid-cols-2 gap-3  justify-items-center align-items-center ">
         {currentQuestion.options.map((option, index) => (
           <button
-            className={`${
-              buttonColors[index]
-            } w-20 h-20 rounded-full text-5xl flex items-center justify-center ${getButtonClass(
-              index
-            )}`}
+            className={`${buttonColors[index]
+              } w-20 h-20 rounded-full text-5xl flex items-center justify-center ${getButtonClass(
+                index
+              )}`}
             key={index}
             onClick={() => handleAnswer(option)}
           >
@@ -219,6 +249,7 @@ const Game = () => {
           style={{ width: `${(timeLeft / 10) * 100}%` }}
         ></div>
       </div>
+      <button className="bg-orange-500  mb-2 cursor-pointer hover:bg-gray-400 px-4 py-1  m-auto text-white font-myFont flex items-center justify-center rounded-md mt-6 shadow-md transition duration-300 ease-in-out" onClick={goBack}>back</button>
     </div>
   );
 };
