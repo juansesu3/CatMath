@@ -14,13 +14,13 @@ const isAdminEmails = async (email: string): Promise<boolean> => {
 const authOptions ={
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ""
     })
   ],
   adapter: MongoDBAdapter(clientPromise),
   callbacks: {
-    session: async ({ session, token, user }) => {
+    session: async ({ session, token, user }: { session: any; token: any; user: any }) => {
       if (await isAdminEmails(session?.user?.email)) {
         return session;
       } else {
