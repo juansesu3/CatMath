@@ -1,19 +1,10 @@
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import Link from "next/link";
-import { useCallback, useState } from "react";
-
-export interface SignInCredentials {
-  name: string;
-  password: string;
-}
 
 const LoginForm: React.FC = () => {
-
+  
   const handleSignIn = (provider: string)=>{
-
     signIn(provider)
-
   }
   return (
     <div className="font-myFont w-screen h-screen flex  justify-center items-center">

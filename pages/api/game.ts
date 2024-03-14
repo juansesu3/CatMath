@@ -8,9 +8,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await mongooseConnect();
   await isAdminRequest(req, res);
   const session = await getSession({ req });
-  if (!session) {
-    return res.status(401).json({ error: 'No hay sesión de usuario' });
-  }
+
 
   const authenticatedUserEmail = session?.user?.email;
 

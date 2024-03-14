@@ -14,6 +14,25 @@ type Level = {
   questions: Question[];
 };
 
+type Answer = {
+  tableNumber: number;
+  multiplier: number;
+  responseTime:number;
+
+};
+
+type User ={
+  currentLevel:number;
+  email:string;
+  image:string;
+  name:string;
+  points:string;
+  _id:string;
+  updatedAt:Date;
+  emailVerified:boolean;
+
+
+}
 // Función para generar un número aleatorio dentro de un rango
 const getRandomNumber = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -42,8 +61,6 @@ const generateLevels = (maxTableNumber: number): Level[] => {
 };
 
 const Game = () => {
-
-  const { data: session } = useSession();
   const [correctAnswers, setCorrectAnswers] = useState<Answer[]>([]);
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -52,8 +69,7 @@ const Game = () => {
   const [score, setScore] = useState(0);
   const currentLevel = levels[currentLevelIndex];
   const currentQuestion = currentLevel.questions[currentQuestionIndex];
-  const [userLoggedId, setUserLoggedId] = useState();
-  // Efecto para iniciar el temporizador
+  const [userLogged, setUserLogged] = useState<User>();
   const buttonColors = [
     "bg-[#f78f2e]",
     "bg-[#f14c90]",
@@ -63,6 +79,36 @@ const Game = () => {
 
 
   
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get("/api/game"); // Reemplaza "/api/user" con la ruta correcta de tu API
+      const user = response.data; // Supongo que la información del usuario está en la propiedad "data"
+      setUserLogged(user);
+      console.log("Usuario obtenido:", user);
+      setCurrentLevelIndex(user.currentLevel); // Establecer el nivel actual
+      setScore(parseInt(user.points)); 
+    } catch (error) {
+      console.error("Error al obtesner el usuario:", error);
+    }
+  };
+  useEffect(() => {
+    // Llama a la función para obtener al usuario cuando el componente se monta
+    fetchUser();
+  }, []);
+  useEffect(() => {
+    if (userLogged) {
+      // Calcular el índice del nivel actual
+      const currentLevelIndex = Math.min(
+        Math.floor(score / 12), // Dividir el puntaje por el tamaño de cada nivel
+        levels.length - 1 // Asegurarse de no exceder el número máximo de niveles
+      );
+      setCurrentLevelIndex(currentLevelIndex);
+      
+      // Calcular el índice de la pregunta actual dentro del nivel actual
+      const currentQuestionIndex = score % 12 === 0 ? 11 : (score % 12) - 1;
+      setCurrentQuestionIndex(currentQuestionIndex);
+    }
+  }, [score]);
   
   useEffect(() => {
     if (timeLeft > 0) {
@@ -103,19 +149,13 @@ const Game = () => {
         const updatedScore = prevScore + 1;
         console.log("Puntuación acumulada:", updatedScore);
         // Llama a la función para actualizar la información del usuario
-     if (userLoggedId) {
+     if (userLogged?._id) {
         // Verifica que userLoggedId sea válido antes de llamar a updateUserData
-        updateUserData(userLoggedId, updatedScore, currentLevelIndex);
+        updateUserData(userLogged._id, updatedScore, currentLevelIndex);
       }
       
         return updatedScore;
       });
-     
-      // Opcional: Puedes hacer algo más con la información, como enviarla a una API
-      console.log("Respuesta correcta:", currentQuestion.result);
-      console.log("Tiempo de respuesta:", responseTime);
-      console.log("Puntuación acumulada:", score);
-      console.log(currentLevel.tableNumber);
       
     }
 
@@ -135,21 +175,7 @@ const Game = () => {
     return "";
   };
 
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get("/api/game"); // Reemplaza "/api/user" con la ruta correcta de tu API
-      const user = response.data; // Supongo que la información del usuario está en la propiedad "data"
-      setUserLoggedId(user._id)
-      console.log("Usuario obtenido:", user._id);
-    } catch (error) {
-      console.error("Error al obtener el usuario:", error);
-    }
-  };
 
-  useEffect(() => {
-    // Llama a la función para obtener al usuario cuando el componente se monta
-    fetchUser();
-  }, []);
   
   const updateUserData = async (userLoggedId: string, score: number, currentLevelIndex: number) => {
   
@@ -159,8 +185,6 @@ const Game = () => {
         points: score, // Actualizar puntos
         currentLevel: currentLevelIndex, // Actualizar nivel actual
       });
-  
-      console.log("Información del usuario actualizada:", response.data);
     } catch (error) {
       console.error("Error al actualizar la información del usuario:", error);
     }

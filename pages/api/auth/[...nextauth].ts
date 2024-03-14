@@ -7,9 +7,7 @@ import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "@/lib/mongodb";
 const isAdminEmails = async (email: string): Promise<boolean> => {
- 
   mongooseConnect()
-
   return !!(await User.findOne({ email: email }));
 };
 
@@ -31,18 +29,15 @@ const authOptions ={
     },
   },
 };
-const handler = NextAuth(authOptions);
-export default handler;
+export default NextAuth(authOptions);
 
 export const isAdminRequest = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await getServerSession(req, res, authOptions);
-
     if (!session || !session.user) {
       res.status(401).end("Not authenticated");
       return;
     }
-
     if (!(await isAdminEmails(session.user.email || ''))) {
       res.status(401).end("Not an admin");
       return; 
