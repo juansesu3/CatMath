@@ -101,13 +101,10 @@ const Game = () => {
   }, []);
   useEffect(() => {
     if (userLogged) {
-      // Calcular el índice del nivel actual
-      const currentLevelIndex = Math.min(
-        Math.floor(score / 12), // Dividir el puntaje por el tamaño de cada nivel
-        levels.length - 1 // Asegurarse de no exceder el número máximo de niveles
-      );
+      // Calcular el índice del nivel actual basado en el puntaje
+      const currentLevelIndex = Math.floor(score / 12); // Dividir el puntaje por el tamaño de cada nivel
       setCurrentLevelIndex(currentLevelIndex);
-
+  
       // Calcular el índice de la pregunta actual dentro del nivel actual
       const currentQuestionIndex = score % 12 === 0 ? 11 : (score % 12) - 1;
       setCurrentQuestionIndex(currentQuestionIndex);
@@ -218,6 +215,7 @@ const Game = () => {
         points: score, // Actualizar puntos
         currentLevel: currentLevelIndex, // Actualizar nivel actual
       });
+      console.log('>>>>>>>>',currentLevelIndex)
     } catch (error) {
       console.error("Error al actualizar la información del usuario:", error);
     }
